@@ -1,5 +1,6 @@
 import random
 
+
 class Operations:
     def __init__(self, crossover_prob: float, mutation_prob: float):
         self.crossover_prob = crossover_prob
@@ -19,41 +20,60 @@ class Operations:
         return generated
 
 
-    def selection(self, population: list[str], scores: list[int | float]):
-        probs = [0]
-        curr_total = 0
-        min_score = min(scores)
-        if min_score < 0:
-            scores = [score + abs(min_score) + 0.001 for score in scores]
+    def get_probs_from_scores(self, scores: list[int | float]) -> list[float]:
+        probs = [0.0]
         total = sum(scores)
+        curr_total = 0.0
         for score in scores:
             curr_total += score
             probs.append(curr_total / total)
-        selected = random.random()
-        idx = 0 
-        while idx < len(population) - 1 and not probs[idx] <= selected <= probs[idx + 1]:
-            idx += 1
-        return population[idx] 
+        return probs
 
 
-    def crossover(self, parent1: str, parent2: str, idx: int | None = None) -> tuple[str, str]:
-        """If idx is None, then a random cut point will be chosen."""
-        if random.random() > self.crossover_prob:
-            return (parent1, parent2)
-        
-        if idx is None:
-            idx = random.randint(1, len(parent1) - 1)
-
-        child1 = parent1[:idx] + parent2[idx:]
-        child2 = parent1[idx:] + parent2[:idx]
-        return (child1, child2)
-
-
-    def mutation(self, parent: str) -> str:
-        child = ""
-        for bit in parent:
-            if random.random() > self.mutation_prob:
-                child += bit
+    def selection(self, population: list[str], scores: list[int | float]) -> tuple[str, float, int]:
+        """Roulette wheel selection with binary search.
+        Returns (chromosome, u_value, 1-based index)."""
+        probs = self.get_probs_from_scores(scores)
+        # Cautam intervalul folosind cautare binara
+        u = random.random()
+        l, r = 0, len(probs) - 1
+        while l < r - 1:
+            mid = (l + r) // 2
+            if probs[mid] <= u:
+                l = mid
             else:
+                r = mid
+        return population[l], u, l + 1
+
+
+    def crossover_participation(self, n: int) -> list[tuple[float, bool]]:
+        """Returns (u, participates) for each of n chromosomes."""
+        result = []
+        for _ in range(n):
+            u = random.random()
+            result.append((u, u < self.crossover_prob))
+        return result
+
+
+    def crossover(self, parent1: str, parent2: str) -> tuple[str, str, int]:
+        """Single-point crossover. Returns (child1, child2, break_point).
+        break_point=0 means no exchange."""
+        break_point = random.randint(0, len(parent1) - 1)
+        if break_point == 0:
+            return parent1, parent2, 0
+        child1 = parent1[:break_point] + parent2[break_point:]
+        child2 = parent2[:break_point] + parent1[break_point:]
+        return child1, child2, break_point
+
+
+    def mutation(self, parent: str) -> tuple[str, bool]:
+        """Bit-flip mutation. Returns (mutated_chromosome, was_changed)."""
+        child = ""
+        changed = False
+        for bit in parent:
+            if random.random() < self.mutation_prob:
                 child += str(1 - int(bit))
-        return child
+                changed = True
+            else:
+                child += bit
+        return child, changed
