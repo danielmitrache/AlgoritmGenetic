@@ -80,7 +80,15 @@ class Simulation:
 
         participant_idx = [i for i, (_, p) in enumerate(participation) if p]
         post_crossover = new_pop[:]
-        for k in range(0, len(participant_idx) - 1, 2):
+
+        limit = len(participant_idx)
+        if limit % 2 == 1:
+            if limit >= 3:
+                limit -= 3 
+            else:
+                limit = 0  # singur participant, nu poate face crossover
+
+        for k in range(0, limit, 2):
             i, j = participant_idx[k], participant_idx[k + 1]
             c1, c2, bp = self.ops.crossover(new_pop[i], new_pop[j])
             post_crossover[i] = c1
@@ -89,6 +97,17 @@ class Simulation:
                 self.f.write(f"\nRecombinare dintre cromozomul {i+1} cu cromozomul {j+1}:\n")
                 self.f.write(f"{new_pop[i]} {new_pop[j]} punct {bp}\n")
                 self.f.write(f"Rezultat {c1} {c2}\n")
+
+        if len(participant_idx) % 2 == 1 and len(participant_idx) >= 3:
+            i, j, k = participant_idx[-3], participant_idx[-2], participant_idx[-1]
+            c1, c2, c3, bp1, bp2 = self.ops.crossover3(new_pop[i], new_pop[j], new_pop[k])
+            post_crossover[i] = c1
+            post_crossover[j] = c2
+            post_crossover[k] = c3
+            if verbose:
+                self.f.write(f"\nRecombinare dintre cromozomii {i+1}, {j+1}, {k+1}:\n")
+                self.f.write(f"{new_pop[i]} {new_pop[j]} {new_pop[k]} puncte {bp1} {bp2}\n")
+                self.f.write(f"Rezultat {c1} {c2} {c3}\n")
 
         if verbose:
             self.f.write("\nDupa recombinare:\n")
@@ -149,6 +168,7 @@ class Simulation:
             if score == best_score:
                 sol = self.conv.decode(x)
                 return (sol, score)
+
 
     def get_all_solutions(self) -> list[tuple[float, float]]:
         return list(zip(list(map(self.conv.decode, self.population)), self.__get_scores(self.population)))

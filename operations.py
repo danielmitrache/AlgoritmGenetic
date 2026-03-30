@@ -10,13 +10,13 @@ class Operations:
     def generate(self, dim_pop: int, length: int) -> list[str]:
         generated = []
         for _ in range(dim_pop):
-            num_of_ones = random.randint(0, length)
-            indexes = random.sample(range(0, length), num_of_ones)
-            gen_num = ["0"] * length
-            for idx in indexes:
-                gen_num[idx] = "1"
-            gen_num = "".join(gen_num)
-            generated.append(gen_num)
+            crom = ""
+            for _ in range(length):
+                if random.random() < 0.5:
+                    crom += "0"
+                else:
+                    crom += "1"
+            generated.append(crom)
         return generated
 
 
@@ -64,6 +64,19 @@ class Operations:
         child1 = parent1[:break_point] + parent2[break_point:]
         child2 = parent2[:break_point] + parent1[break_point:]
         return child1, child2, break_point
+    
+
+    def crossover3(self, parent1: str, parent2: str, parent3: str) -> tuple[str, str, str, int, int]:
+        """Double-point crossover. Return (child1, child2, child3. break_point1, break_point2)."""
+        length = len(parent1)
+        break_point1 = random.randint(1, length - 2)
+        break_point2 = random.randint(break_point1 + 1, length - 1)
+
+        child1 = parent1[:break_point1] + parent2[break_point1:break_point2] + parent3[break_point2:]
+        child2 = parent2[:break_point1] + parent3[break_point1:break_point2] + parent1[break_point2:]
+        child3 = parent3[:break_point1] + parent1[break_point1:break_point2] + parent2[break_point2:]
+
+        return child1, child2, child3, break_point1, break_point2
 
 
     def mutation(self, parent: str) -> tuple[str, bool]:
