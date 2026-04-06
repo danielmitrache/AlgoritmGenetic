@@ -1,0 +1,29 @@
+population_size: 20
+
+
+# Domain extremes, closed at both ( [a, b] )
+domain_left: -1
+domain_right: 2
+
+
+# Quadratic function arguments ( a * x^2 + b * x + c )
+a: -1
+b: 1
+c: 2
+
+
+# Precision
+prec: 6
+
+
+# Probabilities for crossover and mutation
+crossover_prob: 0.25
+mutation_prob: 0.01
+
+
+# Number of iterations
+num_steps: 50
+
+
+# Elitims flag 
+use_elitism: True

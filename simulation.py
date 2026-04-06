@@ -2,7 +2,7 @@ from converter import Converter
 from operations import Operations
 
 class Simulation:
-    def __init__(self, dim_pop, dom_left, dom_right, a, b, c, prec, crossover_prob, mutation_prob, nr_steps):
+    def __init__(self, dim_pop, dom_left, dom_right, a, b, c, prec, crossover_prob, mutation_prob, nr_steps, use_elitism):
         self.dim_pop = dim_pop
         self.dom_left = dom_left
         self.dom_right = dom_right
@@ -13,6 +13,7 @@ class Simulation:
         self.crossover_prob = crossover_prob
         self.mutation_prob = mutation_prob
         self.nr_steps = nr_steps
+        self.use_elitism = use_elitism
 
 
     def initialize(self):
@@ -134,9 +135,10 @@ class Simulation:
             self.f.write("\n")
 
         # Elitism: inlocuim cel mai slab cu elita
-        final_scores = self.__get_scores(post_mutation)
-        worst_idx = final_scores.index(min(final_scores))
-        post_mutation[worst_idx] = elite
+        if self.use_elitism:
+            final_scores = self.__get_scores(post_mutation)
+            worst_idx = final_scores.index(min(final_scores))
+            post_mutation[worst_idx] = elite
         self.population = post_mutation
 
 
