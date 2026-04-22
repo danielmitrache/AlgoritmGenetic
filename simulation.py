@@ -91,7 +91,7 @@ class Simulation:
 
         for k in range(0, limit, 2):
             i, j = participant_idx[k], participant_idx[k + 1]
-            c1, c2, bp = self.ops.crossover(new_pop[i], new_pop[j])
+            c1, c2, bp = self.ops.crossover2(new_pop[i], new_pop[j])
             post_crossover[i] = c1
             post_crossover[j] = c2
             if verbose:

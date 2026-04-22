@@ -1,6 +1,5 @@
 import random
 
-
 class Operations:
     def __init__(self, crossover_prob: float, mutation_prob: float):
         self.crossover_prob = crossover_prob
@@ -31,8 +30,6 @@ class Operations:
 
 
     def selection(self, population: list[str], scores: list[int | float]) -> tuple[str, float, int]:
-        """Roulette wheel selection with binary search.
-        Returns (chromosome, u_value, 1-based index)."""
         probs = self.get_probs_from_scores(scores)
         # Cautam intervalul folosind cautare binara
         u = random.random()
@@ -47,7 +44,6 @@ class Operations:
 
 
     def crossover_participation(self, n: int) -> list[tuple[float, bool]]:
-        """Returns (u, participates) for each of n chromosomes."""
         result = []
         for _ in range(n):
             u = random.random()
@@ -55,9 +51,7 @@ class Operations:
         return result
 
 
-    def crossover(self, parent1: str, parent2: str) -> tuple[str, str, int]:
-        """Single-point crossover. Returns (child1, child2, break_point).
-        break_point=0 means no exchange."""
+    def crossover2(self, parent1: str, parent2: str) -> tuple[str, str, int]:
         break_point = random.randint(0, len(parent1) - 1)
         if break_point == 0:
             return parent1, parent2, 0
@@ -67,7 +61,6 @@ class Operations:
     
 
     def crossover3(self, parent1: str, parent2: str, parent3: str) -> tuple[str, str, str, int, int]:
-        """Double-point crossover. Return (child1, child2, child3. break_point1, break_point2)."""
         length = len(parent1)
         break_point1 = random.randint(1, length - 2)
         break_point2 = random.randint(break_point1 + 1, length - 1)
@@ -80,7 +73,6 @@ class Operations:
 
 
     def mutation(self, parent: str) -> tuple[str, bool]:
-        """Bit-flip mutation. Returns (mutated_chromosome, was_changed)."""
         child = ""
         changed = False
         for bit in parent:
